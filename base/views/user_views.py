@@ -1,5 +1,4 @@
-from .models import Product
-from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken
+from base.serializers import UserSerializer, UserSerializerWithToken
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -27,6 +26,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
+
 @api_view(['POST'])
 def registerUser(request):
     data = request.data
@@ -45,6 +45,7 @@ def registerUser(request):
         message = {'detail': 'User with this E-mail alredy exists'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getUserProfile(request):
@@ -59,18 +60,3 @@ def getUsers(request):
     users = User.objects.all()
     serializers = UserSerializer(users, many=True)
     return Response(serializers.data)
-
-
-@api_view(['GET'])
-def getProducts(request):
-    products = Product.objects.all()
-    serializers = ProductSerializer(products, many=True)
-    return Response(serializers.data)
-
-
-@api_view(['GET'])
-def getProduct(request, pk):
-    product = Product.objects.get(_id=pk)
-    serializer = ProductSerializer(product, many=False)
-
-    return Response(serializer.data)
