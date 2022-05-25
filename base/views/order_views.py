@@ -1,14 +1,15 @@
 from base.models import Product, Order, OrderItem, ShippingAddress
-from base.serializers import ProductSerializer, OrderSerializer
+from base.serializers import OrderSerializer
 
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from rest_framework import status
 
 
 @api_view(['POST'])
-@permission_classes(['IsAuthenticated'])
+@permission_classes([IsAuthenticated])
 def addOrderItems(request):
     user = request.user
     data = request.data
@@ -21,7 +22,7 @@ def addOrderItems(request):
         # (1) Create order
         order = Order.objects.create(
             user=user,
-            payment=data['paymentMethod'],
+            paymentMethod=data['paymentMethod'],
             taxPrice=data['taxPrice'],
             shippingPrice=data['shippingPrice'],
             totalPrice=data['totalPrice']
@@ -49,9 +50,9 @@ def addOrderItems(request):
                 image=product.image.url
             )
 
-        # (4) Update stock
-        product.countInStock -= item.qty
-        product.save()
+            # (4) Update stock
+            product.countInStock -= item.qty
+            product.save()
 
-    serializer = OrderSerializer(order, many=False)
-    return Response(serializer.data)
+        serializer = OrderSerializer(order, many=False)
+        return Response(serializer.data)
